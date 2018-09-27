@@ -8,4 +8,5 @@ For example, the elements of statistical learning:
 
 [elements of statistical learning](https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
 
+[CMU Probabilistic Graphical Models] (http://www.cs.cmu.edu/~epxing/Class/10708-14/lecture.html)
 
