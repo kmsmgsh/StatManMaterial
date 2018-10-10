@@ -1,7 +1,8 @@
 # StatManMaterial
-Data_savings
+
 
 This is a reposity created for Prof.Pan's student to share notes, material and code. In order to make the material sharing not limited by email or other things.
+Maybe this is turn to my personal notes/slides collect project.
 And some online-available books may update by url in this readme file.
 
 For example, the elements of statistical learning:
