@@ -6,9 +6,15 @@ And some online-available books may update by url in this readme file.
 
 For example, the elements of statistical learning:
 
-[elements of statistical learning](https://web.stanford.edu/~hastie/Papers/ESLII.pdf)
+Book
+
+[elements of statistical learning](https://web.stanford.edu/~hastie/Papers/ESLII.pdf) 
+
+Online course
 
 [CMU Probabilistic Graphical Models](http://www.cs.cmu.edu/~epxing/Class/10708-14/lecture.html)
+
+The first presentation slides
 
 [Elastic net presentation](/PresentationSlides/elastic_net_presentation.html)
 
