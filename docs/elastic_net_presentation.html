@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elastic-net: a Regularization and Variable Selection Method</title>
+    <meta charset="utf-8">
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Elastic-net: a Regularization and Variable Selection Method
+### 2018/09/30
+
+---
+
+
+
+
+
+# The elastic-net.
+Usual linear regression model
+
+`$$\hat y=\hat \beta_0+x_1\hat\beta_1+\cdots+x_p\hat\beta_p$$`
+
+
+Two criteria for modelling quality
+
+- Accuracy for Prediction
+
+- Interpretability
+
+Ordinary least square estimator are not performed well in both cases. The penalized method are proposed to improve such issue. The most famous method is
+
+
+
+
+- Ridge regression
+
+- lasso
+
+
+---
+&lt;!-- #class: center, middle --&gt;
+
+# Penalty method 
+
+- Ridge Regression: `\(L_2\)` -penalty
+
+  - Ridge regression sacrificed the property of Unbiased to decrease the variance via bias-variance trade off.
+However ridge regression cannot produce pasimonious model. 
+
+- Lasso: `\(L_1\)` -penalty
+  - A continuous shrinkage auto-mate variable selection method
+  - with some limitations we will introduce later .. 
+
+- Ridge Regression `\(L_p\)` -penalty
+
+### Problem: None of them can uniformly dominates the other two.
+
+showed by &lt;a name=cite-tibshirani1996regression&gt;&lt;/a&gt;[Tibshirani (1996)](#bib-tibshirani1996regression),
+
+???
+Ridge regression always keep all predictor in the model. Best Subset selection can produce a sparse model but the variable be choose could be extrme due to the discreteness.
+
+
+---
+
+# Limitation for Lasso
+
+1. In p&gt;n case: Select at most n variable.
+  - Lasso is not well defined if `\(L_1\)` -norm of the coefficients is larger than a certain value.
+
+2. Group effect
+  - Can't handle the group of variables which its pairwise correlation is high. 
+
+3. High correlation
+  - In n&gt;p situation, if the correlation between predictors is high, the prediction performance is dominated by Ridge Regression.
+
+The limitation 1 and 2 indicate that Lasso is an inappropriate variable seelction method under certain circumstance.
+
+???
+p&gt;n limiting feature for a variable selection model
+
+lasso tend to choose one variable from the group and does not care which one is selected.
+
+Illustrate the Gene Example.
+
+---
+
+# Example
+
+A gene example:
+- Data
+  - Typical microarray data: 
+     - predictors (gene): many thousands , 
+     - samples: &lt;100
+  - Forming a group
+     - The correlation between the genes is high when they shared same biological 'pathway'. Called "forming a group".
+  
+- Goal
+  - Eliminate the trivial genes
+  - Include while groups in to the model
+
+The the two key feature of this kind of problems is :1. p&gt;&gt;n 2. grouped variable
+
+---
+
+# Naïve Elastic-net, the basic
+
+- Notation: 
+
+  `\(\mathbb{Y}=(y_1,\cdots,y_n)^T\)`, Response.
+  
+  `\(\mathbb{X}=(x_1,|,\cdots,|x_p)^T\)` model matrix (or design matrix).
+  
+  `\(x_j=(x_{1j},\cdots,x_{nj})^T\)`,$j=1,...,p$
+
+- Assume: The response is centred and predictors are standardized.
+
+  `\(\sum_{i=1}^n y_i=0\)`, 
+  
+  `\(\sum_{i=1}^n x_{ij}=0\)`, 
+  
+  `\(\sum_{i=1}^n x_{ij}^2=1\)` for `\(j=1,...,p\)`
+  
+
+---
+
+# Naïve Elastic-net
+- Naïve elastic-net criterion
+
+  For fixed non-negative `\(\lambda_1\)` &amp; `\(\lambda_2\)`, the naïve elastic-net criterion is
+  
+`$$L(\lambda_1,\lambda_2,\beta)=|y-X\beta|^2+\lambda_2|\beta|^2+\lambda_1|\beta|_1$$`
+    where `\(|\beta|^2=\sum_{j=1}^p \beta_j^2\)`,$|\beta|_1=\sum_{j=1}^p |\beta_j|$.
+
+- Naïve elastic-net estimator
+
+  The Naïve elastic-net estimator `\(\hat\beta\)` is
+$$
+\hat\beta=\operatorname*{argmin}_\beta \{L(\lambda_1,\lambda_2,\beta)\}
+$$
+
+---
+
+# Naïve Elastic-net 
+  Similar to the lasso, the elastic net criterion is equivelanat to
+  `$$\begin{align}\hat\beta=\operatorname*{argmin}_\beta |y-X\beta|^2\ \ \ \text{subject to}\\ (1-\alpha)|\beta|_1+\alpha|\beta|^2\leq t \ \ \text{for some } t\end{align}$$`
+
+The subjecting area `\((1-\alpha)|\beta|_1+\alpha|\beta|^2\leq t\)` is a convex combination of Lasso and ridge regression, a weighted average.
+
+One thing should be mentioned here is this criterion is strically convex for `\(\alpha&gt;0\)`. (Lasso is the special case for `\(\alpha=0\)`, which is convex but not strictly convex).
+
+---
+
+![](Region.png)
+---
+
+# Lemma1:
+Given data set `\((y,X)\)` and `\((\lambda_1,\lambda_2)\)`, define an artificial data set `\((y^*,X^*)\)` by 
+`$$\begin{align}X^*_{(n+p)\times p}=(1+\lambda_2)^{(-1/2)}\begin{pmatrix}X\\\sqrt{\lambda_2}I\\\end{pmatrix},y^*_{(n+p)}=\begin{pmatrix}y\\0\end{pmatrix} \end{align}$$`
+Let `\(\gamma=\lambda_1/\sqrt{(\lambda_2+1)}\)` and `\(\beta^*=\sqrt{(1+\lambda_2)}\beta\)`. Then the naïve elastic-net criterion can be written as
+`$$L(\gamma,\beta)=L(\gamma,\beta^*)=|y^*-X^*\beta^*|+\gamma|\beta^*|_1$$`
+Let
+`$$\hat\beta^*=\operatorname*{argmin}_\beta L\{(\gamma,\beta^*)\}$$`
+then
+`$$\hat\beta=\frac{1}{\sqrt{(1+\lambda_2)}}\hat\beta^*$$`
+???
+
+It can be showed that the naïve elastic-net can be transfered to a lasso-type optimization problem, which means the efficiency algorithm used in lasso can also help solve the naïve elastic-net.
+
+Lemma 1 says that we can transform the naive elastic net problem into an equivalent lasso problem on augmented data. Note that the sample size in the augmented problem is p and `\(X^*\)` has rank p, which means that hte naive elastic net can potentially select all p predictor in all situations. This important property overcomes the limitations of the lasso that were described in scenario (a). Lemma 1 also shows that the naive elastic net can perform an automatic variable selection in a fashion similar to the lasso.
+
+---
+
+# Proof
+
+From the original Loss function
+
+`$$\begin{align}
+L_{\lambda_1,\lambda_2}(\beta)&amp;=||Y-X\beta||^2_2+\lambda_2|\beta|^2+\lambda_1|\beta|\\
+&amp;=||\begin{pmatrix}
+Y\\
+0\\
+\end{pmatrix}-\begin{pmatrix}
+X\\
+\sqrt\lambda_2I\\
+\end{pmatrix}\beta
+||^2_2+\lambda_1|\beta|\\
+\end{align}$$`
+
+This is a standard form of the `\(L_1\)` penalty problem. 
+It shoud be mentioned that the design matrix of a lasso type problem should be standardized. Denote the new design matrix `\(\begin{pmatrix}X\\\sqrt\lambda_2I\\\end{pmatrix}\)` as `\(X^*\)`. For each column, denote by `\(j\)`, then we have
+$$
+`\begin{align}
+\sum^{n+p}_{i=1}x^{*2}_{ij}&amp;=\sum_{i=1}^n x_{ij}^2+\lambda_2\\
+&amp;=1+\lambda_2
+\end{align}`
+$$
+That means the normarlising constant we need import in the loss function is `\(1+\lambda_2\)`. 
+---
+We modified the loss function as
+`$$\begin{align}
+&amp;||\begin{pmatrix}
+Y\\
+0\\
+\end{pmatrix}-\frac{1}{\sqrt{1+\lambda_1}}
+\begin{pmatrix}X\\\sqrt\lambda_2I\\\end{pmatrix}
+\sqrt{1+\lambda_2}\beta
+||^2_2+\frac{\lambda_1}{\sqrt{1+\lambda_2}}|\sqrt{(1+\lambda_2)}\beta|\\
+=&amp;||\begin{pmatrix}
+Y\\
+0\\
+\end{pmatrix}-\frac{1}{\sqrt{1+\lambda_1}}
+\begin{pmatrix}X\\\sqrt\lambda_2I\\\end{pmatrix}
+\beta^*
+||^2_2+\gamma|\beta^*| 
+\end{align}$$`
+Q.E.D
+
+In the case of orthogonal design, which means the design matrix is orthogonal, we have `\(X^TX=I\)`, then the elastic net solution is
+`$$\hat\beta_i(\text{naïve elastic net})=\frac{(|\hat\beta_i(OLS)|-\lambda_1/2)_+}{1+\lambda_2}sgn\{\hat\beta_i(OLS)\}$$`
+
+
+`$$\begin{align}
+\frac{dL_{\lambda_1,\lambda_2}(\beta)}{d\beta_i}=&amp;\frac{d(||Y-X\beta||^2_2+\lambda_1|\beta|_1+\lambda_2|\beta|^2)}{d\beta_i}\\
+0=&amp;-2X^T(Y-X\beta)+\lambda_1 sgn(\beta_i)\\
+=&amp; -2X^Ty+2\beta_i+2\lambda_2\beta_i+\lambda_1/2 sgn(\beta_i)\\
+\hat\beta_i=&amp;\frac{-\hat\beta_i(OLS)+\lambda_1/2 sgn(\beta_i)}{\lambda_2+1}
+\end{align}$$`
+
+---
+
+![](Orthogonal.png)
+
+---
+
+# The Grouping Effect
+
+
+- Previous methods:
+    - Principle Component Analysis : Found high correlated genes.
+    - Tree-Harvesting: Select group of gene by Hierachical Clustering.
+    - ...
+    
+Regression analysis with generic penaly can be written as
+
+`$$\begin{equation}\label{eq1}\hat\beta=\operatorname*{argmin}_\beta |y-X\beta|^2+\lambda J(\beta)\tag{1}\end{equation}$$`
+
+where `\(J(\cdot)\)` is positive valued for `\(\beta\neq 0\)`.
+- In Regression model showed upon we want
+    - Highly correlated variable (in a group) tend to be equal. (in absolute value, sign may not because of the negative correlated)
+    - Extrem Situation: When the variables are identical, the coefficient should also identical.
+
+---
+# The Grouping Effect
+
+
+
+#### Lemma2:
+Assume that `\(x_i=x_j,i,j\in\{1,...,p\}\)`
+
+ (a) If `\(J(\cdot)\)` is strictly convex, then `\(\hat\beta_i=\hat\beta_j,\forall \lambda&gt;0\)`
+
+ (b) If `\(J(B)=|\beta|_1\)`, then `\(\hat\beta_i\hat\beta_j\geqslant0\)` and `\(\hat\beta^*\)` is another minimizer of equation of general regression with penalty in page 10 equation (\ref{eq1}) , where
+
+`$$\begin{align}
+\hat\beta^*_k=\begin{cases}
+    \hat\beta_k\  &amp;\text{if  } k\neq i \text{and } k\neq j \\
+    (\hat\beta_i+\hat\beta_j)\cdot s\ &amp; \text{if  } k= i  \\
+    (\hat\beta_i+\hat\beta_j)\cdot (1-s) &amp; \text{if  } k=j\\
+  \end{cases}
+\end{align}$$`
+
+This lemma showed the distinction between strictly convex penalty and lasso.
+
+
+???
+The strict convexity gurantees the grouping effect in the extreme situation with identical predictors. In contrast the lasso does not even have a unique solution. The elastic net penalty with `\(\lambda_2&gt;0\)` is strictly convex, thus enjoying the property in assertion 1.
+
+---
+# The Grouping Effect
+
+#### Theorem .1
+Given data `\((y,X)\)` and parameters `\((\lambda_1,\lambda_2)\)`, the response `\(y\)` is centred and the predictors `\(X\)` are standardized. Let `\(\beta(\lambda_1,\lambda_2)\)` be the naïve elastic net estimate. Suppose that `\(\hat\beta_i(\lambda_1,\lambda_2)\hat\beta_j(\lambda_1,\lambda_2)&gt;0\)`. Define
+$$
+D_{\lambda_1,\lambda_2}(i,j)=\frac{1}{|y|_1}|\hat\beta_i(\lambda_1,\lambda_2)-\hat\beta_j(\lambda_1,\lambda_2)|;
+$$
+
+then
+
+$$
+D_{\lambda_1,\lambda_2}(i,j)\leqslant \frac{1}{\lambda_2}\sqrt{\{2(1-\rho)\}}
+$$
+
+where `\(\rho=x_i^Tx_j\)`, the sample correlation.
+
+???
+![](WeirdExample.jpg)
+
+---
+
+# Bayesian connections and the `\(L_q\)`-penalty
+
+- Bridge Regression: `\(J(\beta)=|\beta|^q_q=\sum_{j=1}^p|\beta_j|^q\)`
+
+  Can be viewed as: Bayesian posterior mode under prior
+$$
+prior_{\lambda,q}(\beta)=C(\lambda,q)exp(-\lambda|\beta|^q_q)
+$$
+- `\(q=2\)` (Ridge Regression): Gaussian Prior
+
+- `\(q=1\)` (Lasso): Laplacian Prior/ Double-exponential prior
+
+- The Elastic Net prior:
+`$$prior_{\lambda,\alpha}(\beta)=c(\lambda,\alpha)exp[-\lambda\{\alpha|\beta|^2+(1-\alpha)|\beta|_1\}]$$`
+
+The elastic net prior is a compromise between the Gaussian and Laplacian priors.
+???
+The q=2 case is the square part of the prior, q=1 is the Laplacian case. 
+
+
+`\(L_q\)` penalty family with `\(q\geqslant 1\)`, only lasso can produce sparse solution.
+Bridge Regression will contain all the predictor inside the model, since the automatic variable selection via penalization is a primary object, so `\(L_q (1&lt;q&lt;2)\)` penalization is not a candidate.
+
+---
+# Elastic Net
+#### Deficiency of the Naïve Elastic Net
+Naïve elastic net overcome the criteria in regression (1) and (2). However, the emperical evidence showed that the Naïve elastic net not perform satisfactorily unless it is very close to either ridge regression or the lasso. In this case, naïve elastic net is meaningless (either perform bad or similar to lasso or ridge regression).
+
+In order to overcome such problem, we need deep in the mechanism of naïve elastic net.
+The naïve elastic net can be viewed as two-stage procedure
+
+- Fixed `\(\lambda_2\)` the ridge regression coefficients
+
+- Do the Lasso type shrinkage. (Along the lasso coefficient solution path)
+
+The two-stage procedure showed following fact:
+
+- Naïve elastic net appear double amount of shrinkage.
+
+???
+Double shrinkage does not help to reduce the variance much and introduces unnecessary extra bias, compared with pure lasso or ridge shrinkage. Intuitively, the prediction performance of the naïve elastic net can be  improved by correcting this double shrinkage.
+---
+#### The Elastic Net Estimate
+
+Remind the form of naïve elastic net is
+
+$$
+`\begin{align}
+&amp;\hat\beta^*=\operatorname*{argmin}_{\beta^*} ||y^*-X^*\beta^*||^2+\frac{\lambda_1}{\sqrt{1+\lambda_2}}|\beta^*|\\
+&amp;\hat\beta(\text{naïve elastic net})=\frac{1}{\sqrt{(1+\lambda_2)}}\hat\beta^*
+\end{align}`
+$$
+
+
+The elastic net (corrected) estimates `\(\hat\beta\)` are defined by
+$$
+`\begin{align}
+\hat\beta(\text{elastic net})=&amp;\sqrt{(1+\lambda_2)}\hat\beta^*\\
+=&amp;(1+\lambda_2)\hat\beta(\text{naïve elastic net})
+\end{align}`
+$$
+
+The elastic net is rescaling naïve elastic net. The scaling preserve the double shrinkage.
+
+???
+All good property in naïve elastic net is hold. Empirically elastic net performed well compare to lasso and ridge regression.
+
+- Another problem rise here: the problem of the solution pathway, rescaling may "push" the curve move to right hand side.
+- The actual problem is, is the elastic net also inherit the bad property in naïve elastic net? That is, in example, the elastic net select different variable compare with the naïve elastic net. The reason should remain in the solution path during the shrinkage procedure.
+
+
+---
+# The Rescaling Factor
+
+There is another justification for choosing rescalling factor `\(1+\lambda_2\)` as the scalling factor.
+Remind, in orthogonal case, we have
+
+`$$\hat\beta_i(\text{naïve elastic net})=\frac{(|\hat\beta_i(OLS)|-\lambda_1/2)_+}{1+\lambda_2}sgn\{\hat\beta_i(OLS)\}$$`
+
+&gt;minimax optimal (Donoho et.al,1995) Lasso-&gt; Naive elastic net is not optimal -&gt; elastic net automatically achieve minimax optimal.
+
+Motivation for `\((1+\lambda_2)\)`-rescaling: Decomposition of ridge operator.
+
+We start witht he standardized predictor X with
+$$
+`\begin{align}
+X^TX=\left(\begin{array}{cccc}
+1 &amp; \rho_{12} &amp; \cdots &amp; \rho_{1p}\\\
+&amp;1&amp; \vdots &amp;\\
+&amp;&amp;1&amp;\rho_{p-1,p}\\
+&amp;&amp;&amp;1
+\end{array}\right)
+\end{align}`
+$$
+
+---
+
+Ridge regression estimates with parameter `\(\lambda_2\)` are given by `\(\hat\beta(ridge)=\mathbf{R}y\)` with
+$$
+\mathbf{R}=(X^TX+\lambda_2I)^{-1}X^T
+$$
+
+
+
+From the form of `\(X^TX\)`, we can rewrite R as following way
+
+`$$\begin{align}
+\mathbf{R}=\frac{1}{1+\lambda_2}\mathbf{R}^*=\frac{1}{1+\lambda_2}
+\left(\begin{array}{cccc}
+1 &amp; \frac{\rho_{12}}{1+\lambda_2} &amp; \cdots &amp; \frac{\rho_{1p}}{1+\lambda_2}\\\
+&amp;1&amp; \vdots &amp;\vdots\\
+&amp;&amp;1&amp;\frac{\rho_{p-1,p}}{1+\lambda_2}\\
+&amp;&amp;&amp;1
+\end{array}\right)^{-1}
+X^T\end{align}$$`
+
+Because `\(X^TX\)` is the sample correlation matrix for the predictor, the R^* can be viewed as a shrinkaged correlation matrix, the `\(\frac{1}{1+\lambda_2}\)` is scaling factor for the ridge regression.
+This technique we called it "decorrelation." Then we can interpret the head matrix of ridge regression is a decorrelation version of OLS with shrinkage parameter `\(\frac{1}{1+\lambda_2}\)`
+
+The grouping effect riched by ridge regression is comes from the decorrelation part, and the shrinkage is by the shrinkage factor. 
+
+---
+
+Denote `\(\hat\Sigma=X^TX\)`, then we have
+$$
+\frac{X^TX+\lambda_2I}{1+\lambda_2}= (1-\gamma)\hat\Sigma+\gamma I
+$$
+This is the shrinkage the correlation matrix from sample correlation matrix to `\(I\)`.
+???
+
+Remind of the "double shrinkage part", this is the remind of how we unshrinkage the parameter and 
+
+
+
+---
+The proof and the construction of the lemma1.
+ ![](solutionPath.png)
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
