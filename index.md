@@ -19,4 +19,3 @@ Online course
 
 [The second presentation slides](./presentationSlides2/Slides2.md) 
 
-Notation
