@@ -14,8 +14,7 @@ Online course
 
 [CMU Probabilistic Graphical Models](http://www.cs.cmu.edu/~epxing/Class/10708-14/lecture.html)
 
-The first presentation slides
+[The first presentation slides](/PresentationSlides/elastic_net_presentation.html)
 
-[Elastic net presentation](/PresentationSlides/elastic_net_presentation.html)
+[The second presentation slides](/PresentationSlides/Slides2.md) 
 
- 
