@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Some review about Lasso weakness</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Jiaming Shen" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Some review about Lasso weakness
+## Lasso can only select up to n variables
+### Jiaming Shen
+### updated: 2018-10-10
+
+---
+
+# Review the Lasso weakness
+
+# The variable selection property for lasso-&gt; up to n variables
+
+For the lasso form penalty problem 
+`$$\hat { \beta } \in \underset { \beta \in \mathbb { R } ^ { p } } { \operatorname { argmin } } \frac { 1 } { 2 } \| y - X \beta \| _ { 2 } ^ { 2 } + \lambda \| \beta \| _ { 1 }$$`
+the elastic net paper(2004) said that the lasso can only select up to n parameters. Here are two way to explain this.
+
+
+---
+
+1. The optimization way. Quote from [stackexchange](https://stats.stackexchange.com/questions/38299/if-p-n-the-lasso-selects-at-most-n-variables)
+
+   The lasso penalty is a optimization problem which fits the KKT condition, so we have the KKT conditon as
+   `$$\left. \begin{array} { c } { X ^ { T } ( y - X \hat { \beta } ) = \lambda \gamma } \\ { \gamma _ { i } \in \left\{ \begin{array} { l l } { \left\{ \operatorname { sign } \left( \hat { \beta } _ { i } \right) \right\} } &amp; { \text { if } \hat { \beta } _ { i } \neq 0 } \\ { [ - 1,1 ] } &amp; { \text { if } \hat { \beta } _ { i } = 0 } \end{array} \right. , \text { for } i = 1 , \ldots p } \end{array} \right.$$`
+   We use the main of the KKT conditon that `\(|X^T(y-X\hat\beta)|=\lambda\)`, in the abosolute value case we can omit the sub-gradient.
+
+   This formula is a linear system with `\(\hat\beta\)`. Since the rank of the matrix `\(X\)` is up to n, so this linear system with unique result only with n line of `\(\beta\)` . Otherwise it will have infinity solutions. 	
+
+   In another words, this type of optimization problem only solvable when active set `\(E\)` is not larger than n predictors.	
+
+   So in such point of view, the key thing is the rank about the hat matrix. In OLS is `\(X^TX\)`. 													
+
+---
+
+In the mean time, the ridge-regression form is as following
+$$
+\hat\beta=(X^TX+\lambda I)^{-1}X^Ty
+$$
+The rank of hat matrix `\(X^TX+\lambda I\)` can equal to n, so it is solvable.
+
+And for the KKT condition case, maybe because it is strictly convex, so the form of `\(\gamma\)` and the equation we use could change to
+$$
+`\begin{align}
+X^T(y-X\hat\beta)=2\lambda\hat\beta\\
+(X^TX+\lambda I)\hat\beta=X^Ty
+\end{align}`
+$$
+---
+Problem: For general problem
+$$
+\hat { \beta } = \underset { \beta } { \operatorname { argmin } } | y - X \beta | ^ { 2 } + \lambda J ( \beta )=\underset { \beta } { \operatorname { argmin } } L(\beta)
+$$
+If X is not column-full-rank, then the quadratic form is not strictly convex. 
+
+Proof : The theorem about strictly convex: the first-order deriatives and second order deriatives should strictly great than 0, that is `\(L'(\beta)&gt;0\)` and `\(L''(\beta)&gt;0\)` . (Generally speaking, the deriative and 2nd order deriative(Hessian Matrix) is positive definite or semi-positive definite).
+
+The second deriative of quadratic part of the optimization problem is `\(X^TX\)` , if `\(X\)` is not full-column-rank, then `\(X^TX\)` would be semi-positive definite rather than positive definite. Then this part can only hold the convex rather than strictly convex. 
+
+If the penalty term also cannot hold the strictly convex, than the loss function is convex instead of strictly convex. If the penalty term is srictly convex, than a strictly convex term + convex term is strictly convex term. 
+
+---
+
+
+## 2.The approximation to OLS view of the lasso problem.
+
+   When lambda is small and close to 0, the lasso estimator is come close to OLS which is solvable only up to n estimators.
+
+   The problem is, ridge regression is also close to OLS when `\(\lambda\)` comes to 0. Why this unsolvable situation do not happen to ridgeregression ?
+
+   The answer is, ridge regression always keep all the predictor in the model, however, for lasso, the number of predictors be selected is monotonic decreaasing via `\(\lambda\)`. The number of predictor is maximized when `\(\lambda\)` close to 0, that is, the OLS case, number of predictors equals to n.
+
+---
+
+## Another point of view: the sovable condition for linear system
+
+
+
+Another point of view is whether the unorthogonal linear system is solvable。Un orthogonal linear system is solvable if and only it fits the compatibility condition.
+
+The compatibility condition is，the rank of Augmented matrix with response should be equal to the original matrix rank.
+$$
+(X^TX)\hat\beta=\lambda\gamma+X^Ty
+$$
+That is,
+
+the rank of `\(X^TX\)` should equal to rank of `\((X^TX|\lambda \gamma+X^Ty)\)`.
+ Because we have `\(X^Ty \in col(X)\)`，so we need only prove  `\(\lambda\gamma \mathbf{1} \not\in col(X)\)`.
+---
+We can write 
+`$$X _ { \mathcal { E } } ^ { T } \left( y - X _ { \mathcal { E } } \hat { \beta } _ { \mathcal { E } } \right) = \lambda s$$`
+That is, `\(\lambda s\)` is in the column space of `\(X_\mathcal{E}^T\)` .
+
+In this way, this linear system is fullfil the compatibility condition in linear algebra, which is always solvable. However, the same fact always exist. Due to `\(X^TX\)` is not full-rank, even it is solvable, the number of solutions is infinity, which is meaningless in same case.
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
