@@ -10,3 +10,4 @@ For example, the elements of statistical learning:
 
 [CMU Probabilistic Graphical Models](http://www.cs.cmu.edu/~epxing/Class/10708-14/lecture.html)
 
+[WebPage of the reposity](https://kmsmgsh.github.io/StatManMaterial/)
