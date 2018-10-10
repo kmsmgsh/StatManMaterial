@@ -1,5 +1,5 @@
 # Index
 
-[Elastic net presentation](StatManMaterial/PresentationSlides/elastic_net_presentation.html)
+[Elastic net presentation](/PresentationSlides/elastic_net_presentation.html)
 
  
