@@ -16,5 +16,5 @@ Online course
 
 [The first presentation slides](/PresentationSlides/elastic_net_presentation.html)
 
-[The second presentation slides](/PresentationSlides2/Slides2.md) 
+[The second presentation slides](./presentationSlides2/Slides2.md) 
 
